@@ -1,0 +1,132 @@
+spring:
+  application:
+    name: aurafit
+  profiles:
+    default: local
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/aurafit}
+    username: ${DATABASE_USERNAME:aurafit}
+    password: ${DATABASE_PASSWORD:aurafit}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+          connectiontimeout: 3000
+          timeout: 3000
+          writetimeout: 3000
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+  max-http-request-header-size: 16KB
+  tomcat:
+    max-http-form-post-size: 1MB
+    max-swallow-size: 1MB
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:0.1}
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+logging:
+  structured:
+    format:
+      console: logstash
+springdoc:
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:true}
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+aurafit:
+  public-base-url: ${PUBLIC_BASE_URL:http://localhost:8080}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+  security:
+    jwt:
+      issuer: ${JWT_ISSUER:aurafit}
+      secret: ${JWT_SECRET:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=}
+      access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:PT15M}
+  identity:
+    verification:
+      token-ttl: ${EMAIL_VERIFICATION_TOKEN_TTL:PT24H}
+  media:
+    storage:
+      endpoint: ${S3_ENDPOINT:http://localhost:9000}
+      bucket: ${S3_BUCKET:aurafit-private}
+      region: ${S3_REGION:us-east-1}
+      access-key: ${S3_ACCESS_KEY:aurafit-local}
+      secret-key: ${S3_SECRET_KEY:aurafit-minio-local-only}
+      force-path-style: ${S3_FORCE_PATH_STYLE:true}
+    upload:
+      max-file-size-bytes: ${MEDIA_MAX_FILE_SIZE_BYTES:10485760}
+      max-pixels: ${MEDIA_MAX_PIXELS:25000000}
+      min-width: ${MEDIA_MIN_WIDTH:32}
+      min-height: ${MEDIA_MIN_HEIGHT:32}
+      max-width: ${MEDIA_MAX_WIDTH:12000}
+      max-height: ${MEDIA_MAX_HEIGHT:12000}
+  rate-limit:
+    auth-requests-per-minute: ${AUTH_REQUESTS_PER_MINUTE:20}
+  trust-safety:
+    moderation:
+      enabled: true
+      default-approval: true
+    identity-verification:
+      enabled: true
+      require-verified-owner: true
+  generation:
+    max-concurrent-jobs: ${GENERATION_MAX_CONCURRENT_JOBS:3}
+    daily-limit: ${GENERATION_DAILY_LIMIT:10}
+    max-attempts: ${GENERATION_MAX_ATTEMPTS:3}
+    daily-quota-window: ${GENERATION_DAILY_QUOTA_WINDOW:PT24H}
+    lease-duration: ${GENERATION_LEASE_DURATION:PT5M}
+    backoff-base: ${GENERATION_BACKOFF_BASE:PT30S}
+    worker-delay: ${GENERATION_WORKER_DELAY:PT5S}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+aurafit:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+  security:
+    jwt:
+      secret: ${JWT_SECRET}

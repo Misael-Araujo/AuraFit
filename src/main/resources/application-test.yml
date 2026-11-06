@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:aurafit;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  mail:
+    host: localhost
+    port: 1025
+management:
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
